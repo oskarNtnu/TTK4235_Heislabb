@@ -1,0 +1,89 @@
+@startuml class diagram
+
+class Initilize
+
+
+' Controlls the mechanical stuff, and the floor indicator
+class ElevatorController{
+    +elevatorDirection: int
+    +elevatorMoving: boolean
+    +elevatorUp() : void
+    +elevatorDown() : void
+    +elevatorStop() : void
+    +setFloorIndicator(int floor) : void
+
+    +updateElevatorController() : void
+}
+
+class LogicController{
+    +struct ElevatorConditions {
+        enum Direction,
+        bool doorTimer,
+        bool activeObstruction,
+        bool stopPredded,
+        ElevatorState currentState,
+        
+    +int[12] ElevatorConditionVector,
+    +getOrderDirrection() : enum Direction
+    +makeElevatorConditionVector(struct ElevatorConditions, *dataVector) : void
+    +getNextState() : ElevatorState
+
+    'Use the functions in ElevatorController to control the elevator, based on the current state and the derided next state
+    +doStuff( ElevatorState currentState) : void
+
+    +updateLogicController() : void
+
+}
+
+class OrderHandler{
+    +orderUpList: int[4]
+    +orderDownList: int[4]
+    +sortList(bool reverse, *int[16] list) : void
+    +findNextOrder(Direction direction, *int[16] upList, *int[16] downList, int currentFloor) : int
+    +clearFloorFromLists(int floor, *int[16] upList, *int[16] downList) : void
+    +addOrderToList(int floor, Direction direction, *int[16] upList, *int[16] downList, *ButtonStates) : void
+    +getNextOrder() : int
+
+    +ButtonStates
+    +getButtonStates() : ButtonStates
+    
+    +updateOrderHnadler(): void
+}
+
+class ObsructionButton{
+    +getObstructionValue() : boolean
+}
+
+class StoppButton{
+    +getStopButtonValue() : boolean
+}
+
+class FloorSensor{
+    +lastFloor: int
+    +currentFloor: int
+    ' returns -1 if the elevator is between floors
+    +getFloor() : int
+    +getLastFloor() : int
+}
+
+Initilize --> ElevatorController
+
+LogicController <.. ObsructionButton
+
+LogicController ..> OrderHandler
+
+LogicController ..> StoppButton
+LogicController ..> FloorSensor
+
+LogicController --> ElevatorController
+
+
+
+
+
+
+@enduml
+
+
+'returns -1 if the elevator is between floors'
++getLastFloor() : int

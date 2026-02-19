@@ -1,0 +1,22 @@
+@startuml state diagram
+
+state ElevatorRunning {
+    [*] --> OnFloor
+
+    OnFloor --> MovingUp 
+    MovingUp --> OnFloor
+    OnFloor --> MovingDown 
+    MovingDown --> OnFloor
+    OnFloor --> DoorOpen
+    DoorOpen --> OnFloor
+    Obstruction --> DoorOpen
+    DoorOpen --> Obstruction
+
+    Stop --> [H] : StoppButton released
+}
+state Stop 
+ElevatorRunning --> Stop : StoppButton pressed
+
+
+
+@enduml
