@@ -108,6 +108,9 @@ int elevio_floorSensor(void){
     return buf[1] ? buf[2] : -1;
 }
 
+int elevio_lastFloor(void){
+    // todo
+}
 
 int elevio_stopButton(void){
     pthread_mutex_lock(&sockmtx);

@@ -29,6 +29,7 @@ void elevio_stopLamp(int value);
 
 int elevio_callButton(int floor, ButtonType button);
 int elevio_floorSensor(void);
+int elevio_lastFloor(void);
 int elevio_stopButton(void);
 int elevio_obstruction(void);
 
