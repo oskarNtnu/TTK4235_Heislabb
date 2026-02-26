@@ -3,10 +3,13 @@
 #include <signal.h>
 #include <time.h>
 #include "driver/elevio.h"
-
+#include "LogicController.h"
 
 
 int main(){
+
+    testLogic();
+
     elevio_init();
     
     printf("=== Example Program ===\n");
