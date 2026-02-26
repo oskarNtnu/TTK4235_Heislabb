@@ -1,5 +1,8 @@
 @startuml state diagram
 
+state Stop 
+ElevatorRunning --> Stop : StoppButton pressed
+
 state ElevatorRunning {
     [*] --> OnFloor
 
@@ -14,9 +17,6 @@ state ElevatorRunning {
 
     Stop --> [H] : StoppButton released
 }
-state Stop 
-ElevatorRunning --> Stop : StoppButton pressed
-
 
 
 @enduml

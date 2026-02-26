@@ -68,7 +68,7 @@ class FloorSensor{
 
 Initilize --> ElevatorController
 
-LogicController <.. ObsructionButton
+LogicController ..> ObsructionButton
 
 LogicController ..> OrderHandler
 
