@@ -3,6 +3,11 @@
 
 #define N_FLOORS 4
 
+/*
+DIRN_DOWN
+DIRN_STOP
+DIRN_UP
+*/
 typedef enum { 
     DIRN_DOWN   = -1,
     DIRN_STOP   = 0,
@@ -12,6 +17,11 @@ typedef enum {
 
 #define N_BUTTONS 3
 
+/*
+BUTTON_HALL_UP
+BUTTON_HALL_DOWN
+BUTTON_CAB
+*/
 typedef enum { 
     BUTTON_HALL_UP      = 0,
     BUTTON_HALL_DOWN    = 1,
