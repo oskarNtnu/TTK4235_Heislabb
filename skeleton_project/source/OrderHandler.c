@@ -1,4 +1,4 @@
-#include "OrderHanlder.h"
+#include "OrderHandler.h"
 
 
 int orderUpList[4];
@@ -66,7 +66,10 @@ void addOrderToList(int currentFloor, MotorDirection dir, int floorOrder, Button
     }
 
 }
-void clearFloorFromList(int floor, int* upList, int* downList){}
+void clearFloorFromList(int floor, int* upList, int* downList){
+    upList[floor] = 0;
+    downList[floor] = 0;
+}
 
 void updateOrderHandler(){
     for(int f = 0; f < N_FLOORS; f++){
@@ -79,4 +82,19 @@ void updateOrderHandler(){
 
             }
         }
+
+    // Print list 
+    printf("OrderUplist:");
+    printList(orderUpList);
+    printf("OrderDownlist:");
+    printList(orderDownList);
 }
+
+void printList(const int* list){
+    printf("Order list: [");
+    for(int i=0; i<4; i++){
+        printf("%d ", list[i]);
+    }
+    printf("\n");
+}
+
