@@ -19,8 +19,23 @@ Get to a known floor, 0 in this case
 */ 
 
 void elevio_setup(){
-    if (elevio_floorSensor)
+    // Unknown floor
+    // Go down until floor =0
+    if (elevio_floorSensor() != 0){
+        elevio_motorDirection(DIRN_DOWN);
+        while (elevio_floorSensor() != 0){
+            nanosleep(&(struct timespec){0, 10*1000*1000}, NULL);
+        }
+        elevio_motorDirection(DIRN_STOP);
+        // Now in floor 0
+    }
 
+    // Turn off all the lights
+    for(int f = 0; f < N_FLOORS; f++){
+            for(int b = 0; b < N_BUTTONS; b++){
+                elevio_buttonLamp(f, b, 0);
+            }
+        }
 }
 
 
