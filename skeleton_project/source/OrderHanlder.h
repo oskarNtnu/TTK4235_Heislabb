@@ -1,3 +1,5 @@
+#pragma once
+
 #include "driver/elevio.h"
 
 int orderUpList[4];
