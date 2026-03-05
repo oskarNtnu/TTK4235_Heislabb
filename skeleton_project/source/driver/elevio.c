@@ -12,6 +12,7 @@
 static int sockfd;
 static pthread_mutex_t sockmtx;
 
+
 void elevio_init(void){
     char ip[16] = "localhost";
     char port[8] = "15657";
@@ -109,7 +110,15 @@ int elevio_floorSensor(void){
 }
 
 int elevio_lastFloor(void){
-    // todo
+    if (elevio_floorSensor() == -1){
+        return lastFloor;
+    }
+    else{
+        temp = lastFloor;
+        lastFloor = elevio_floorSensor();
+        return temp;
+    }
+    
 }
 
 int elevio_stopButton(void){

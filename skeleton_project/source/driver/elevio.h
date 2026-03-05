@@ -2,6 +2,7 @@
 
 
 #define N_FLOORS 4
+int lastFloor = 0;
 
 typedef enum { 
     DIRN_DOWN   = -1,
