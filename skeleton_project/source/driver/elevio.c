@@ -110,6 +110,7 @@ int elevio_floorSensor(void){
 
 int elevio_lastFloor(void){
     // todo
+    return 0;
 }
 
 int elevio_stopButton(void){

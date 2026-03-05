@@ -1,6 +1,7 @@
 #pragma once
 
 #include <stdio.h>
+#include <time.h>
 
 #include "driver/elevio.h"
 //#include "OrderHanlder.h"
@@ -12,7 +13,6 @@ typedef enum {
 
 
 typedef struct {
-    MotorDirection dir;
     int doorTimer;
     int activeObstruction;
     int stopPressed;
@@ -28,7 +28,7 @@ MotorDirection getMotorDirection();
 void makeElevatorDataArray(int* dataArray, const ElevatorConditions* conditions);
 ElevatorState getNextState( int* dataArray );
 
-void runElevator();
+void runElevator(ElevatorState currentState, int is_new_state);
 
 void updateLogicController();
 
