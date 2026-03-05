@@ -21,6 +21,7 @@ void makeElevatorDataArray(int* dataArray, const ElevatorConditions* conditions)
     
     for (int i=0; i<ELEVATORSTATE_LENGTH; i++) {
         dataArray[6+i] = currentState == i;
+        printf("Data Array[%d]: %d\n", 6+i, dataArray[6+i]);
     }
 }
 
@@ -75,7 +76,7 @@ void updateLogicController() {
 
 void testLogic() {
 
-    int dataArray[MATRIX_COLUMNS];
+    int dataArray[MATRIX_ROWS];
     int* p_dataArray = &dataArray;
 
     ElevatorConditions ev;
@@ -91,7 +92,7 @@ void testLogic() {
     makeElevatorDataArray(p_dataArray, p_ev);
 
     printf("Data Array: ");
-    for (int i=0; i<MATRIX_COLUMNS; i++){
+    for (int i=0; i<MATRIX_ROWS; i++){
         printf( "%d ", dataArray[i]);
     }
 
