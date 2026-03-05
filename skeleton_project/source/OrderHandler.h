@@ -9,3 +9,6 @@ void addOrderToList(int currentFloor, int floorOrder, ButtonType buttonType,  in
 void clearFloorFromList(int floor, int* upList, int* downList);
 
 void updateOrderHandler();
+
+// Test functinos
+void printList(const int* list);
