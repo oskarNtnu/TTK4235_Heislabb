@@ -27,7 +27,7 @@ $(EXECUTABLE): $(OBJECTS)
 
 
 OrderHandlerTest: source/orderHandler_test.c $(filter-out build/main.o, $(OBJECTS))
-	$(COMPILER) $(CFLAGS) $^ -o test_executable $(LDFLAGS)
+	$(COMPILER) $(CFLAGS) $^ -o test_OrderHandler $(LDFLAGS)
 
 
 
