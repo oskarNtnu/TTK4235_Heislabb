@@ -1,9 +1,15 @@
 #include "LogicController.h"
 
+ElevatorConditions* elevatorConditions;
+int* elevatorConditionArray[12];
+
+ElevatorState getCurrentState() { return elevatorConditions->motorDirection; }
+MotorDirection getMotorDirection() { return elevatorConditions->motorDirection; }
+
 void makeElevatorDataArray(int* dataArray, const ElevatorConditions* conditions) {
 
     int currentFloor = elevio_lastFloor();
-    int orderFloor = getOrder(getMotorDirection());
+    int orderFloor = 1; //getOrder(getMotorDirection());
     ElevatorState currentState = conditions->currentState;
 
     dataArray[0] = currentFloor <  orderFloor;
@@ -84,8 +90,9 @@ void testLogic() {
 
     makeElevatorDataArray(p_dataArray, p_ev);
 
+    printf("Data Array: ");
     for (int i=0; i<MATRIX_COLUMNS; i++){
-        printf(dataArray[i]);
+        printf( "%d ", dataArray[i]);
     }
 
 }

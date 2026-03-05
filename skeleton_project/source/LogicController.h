@@ -3,7 +3,7 @@
 #include <stdio.h>
 
 #include "driver/elevio.h"
-#include "OrderHanlder.h"
+//#include "OrderHanlder.h"
 
 
 typedef enum {
@@ -22,12 +22,8 @@ typedef struct {
 } ElevatorConditions;
 
 
-
-ElevatorConditions* elevatorConditions;
-int* elevatorConditionArray[12];
-
-ElevatorState getCurrentState() { return elevatorConditions->motorDirection; };
-MotorDirection getMotorDirection() { return elevatorConditions->motorDirection; };
+ElevatorState getCurrentState();
+MotorDirection getMotorDirection();
 
 void makeElevatorDataArray(int* dataArray, const ElevatorConditions* conditions);
 ElevatorState getNextState( int* dataArray );
