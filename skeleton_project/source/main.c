@@ -8,11 +8,13 @@
 
 int main(){
 
+    elevio_init();
+
     testLogic();
 
-    elevio_init();
-    
+
     printf("=== Example Program ===\n");
+    /*
     printf("Press the stop button on the elevator panel to exit\n");
 
     elevio_motorDirection(DIRN_UP);
@@ -54,6 +56,6 @@ int main(){
         
         // nanosleep(&(struct timespec){0, 20*1000*1000}, NULL);
     }
-
+    */
     return 0;
 }

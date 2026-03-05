@@ -34,6 +34,8 @@ void updateLogicController();
 
 void testLogic();
 
+void doorHandling(int state_enter);
+
 
 #define MATRIX_ROWS 12
 #define MATRIX_COLUMNS 9
