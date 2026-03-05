@@ -1,5 +1,10 @@
+#pragma once
+
+#include <stdio.h>
+
 #include "driver/elevio.h"
 #include "OrderHanlder.h"
+
 
 typedef enum {
     OnFloor, MovingUp, MovingDown, DoorOpen, Obstruction, Stop, ELEVATORSTATE_LENGTH
