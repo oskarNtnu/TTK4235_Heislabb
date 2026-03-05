@@ -13,6 +13,17 @@ static int sockfd;
 static pthread_mutex_t sockmtx;
 
 
+
+/*Initilize the elevator
+Get to a known floor, 0 in this case
+*/ 
+
+void elevio_setup(){
+    if (elevio_floorSensor)
+
+}
+
+
 void elevio_init(void){
     char ip[16] = "localhost";
     char port[8] = "15657";
@@ -110,7 +121,6 @@ int elevio_floorSensor(void){
 }
 
 int elevio_lastFloor(void){
-<<<<<<< HEAD
     if (elevio_floorSensor() == -1){
         return lastFloor;
     }
@@ -119,11 +129,6 @@ int elevio_lastFloor(void){
         lastFloor = elevio_floorSensor();
         return temp;
     }
-    
-=======
-    // todo
-    return 1;
->>>>>>> OrderHandler
 }
 
 int elevio_stopButton(void){
