@@ -25,8 +25,10 @@ clean:
 $(EXECUTABLE): $(OBJECTS) 
 	$(COMPILER) $^ -o $@ $(LDFLAGS)
 
-OrderHandlerTest: tests\orderHandler_test.c
-    $(COMPILER) $(CFLAGS) $^ -o test_executable $(LDFLAGS)
+
+OrderHandlerTest: source/orderHandler_test.c $(filter-out build/main.o, $(OBJECTS))
+	$(COMPILER) $(CFLAGS) $^ -o test_executable $(LDFLAGS)
+
 
 
 ## object files depend on source files: compile them

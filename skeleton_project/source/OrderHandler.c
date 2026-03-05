@@ -1,4 +1,4 @@
-#include "OrderHanlder.h"
+#include "OrderHandler.h"
 
 
 int orderUpList[4];
@@ -20,13 +20,14 @@ int getOrder(MotorDirection dir, int currentFloor){
             }
         }
     }
-    if(dir = DIRN_DOWN){
+    if(dir == DIRN_DOWN){
         for(int f = currentFloor-1; f>N_FLOORS; f--){
             if(orderDownList[f] == 1){
                 return f;
             }
         }
     }
+    return -1; // No order in the direction of movement
 }
 
 /* Add a button order to one of the order lists
@@ -36,7 +37,7 @@ Else check if it is a order up or down, and set the value in the corresponding l
 Last active floor
 @param dir
 The dirrection of the elevator - used if an order is placed in the last floor while it moves away
-@param floorOrder
+@param floorOrder#include #
 Floor wich a button places an order to
 @param buttontype
 Enum with the type of button, UP, Down, or cabin
@@ -72,7 +73,7 @@ void updateOrderHandler(){
     for(int f = 0; f < N_FLOORS; f++){
             for(int b = 0; b < N_BUTTONS; b++){
                 int btnPressed = elevio_callButton(f, b);
-                printf("Button pressed: %d\n", btnPressed);
+                // printf("Button pressed: %d\n", btnPressed);
                 if(btnPressed){ 
                     elevio_buttonLamp(f, b, btnPressed);
                 }
