@@ -25,6 +25,10 @@ clean:
 $(EXECUTABLE): $(OBJECTS) 
 	$(COMPILER) $^ -o $@ $(LDFLAGS)
 
+OrderHandlerTest: tests\orderHandler_test.c
+    $(COMPILER) $(CFLAGS) $^ -o test_executable $(LDFLAGS)
+
+
 ## object files depend on source files: compile them
 $(OBJECTDIR)/%.o: $(SOURCEDIR)/%.c
 	@mkdir -p $(@D)
