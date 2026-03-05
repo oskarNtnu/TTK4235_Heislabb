@@ -49,7 +49,7 @@ int main(){
             break;
         }
         
-        // nanosleep(&(struct timespec){0, 20*1000*1000}, NULL);
+        nanosleep(&(struct timespec){0, 20*1000*1000}, NULL);
     }
 
     return 0;

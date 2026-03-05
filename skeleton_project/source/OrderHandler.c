@@ -74,21 +74,17 @@ void clearFloorFromList(int floor, int* upList, int* downList){
 
 void updateOrderHandler(){
     for(int f = 0; f < N_FLOORS; f++){
-            for(int b = 0; b < N_BUTTONS; b++){
-                int btnPressed = elevio_callButton(f, b);
-                // printf("Button pressed: %d\n", btnPressed);
-                if(btnPressed){ 
-                    elevio_buttonLamp(f, b, btnPressed);
-                }
-
+        for(int b = 0; b < N_BUTTONS; b++){
+            int btnPressed = elevio_callButton(f, b);
+            if(btnPressed){
+                elevio_buttonLamp(f, b, 1);
+                addOrderToList(elevio_floorSensor(), DIRN_STOP, f, b, orderUpList, orderDownList);
             }
-        }
 
-    // Print list 
-    printf("OrderUplist:");
-    printList(orderUpList);
-    printf("OrderDownlist:");
-    printList(orderDownList);
+        }
+    }
+
+
 }
 
 void printList(const int* list){
@@ -96,6 +92,6 @@ void printList(const int* list){
     for(int i=0; i<4; i++){
         printf("%d ", list[i]);
     }
-    printf("\n");
+    printf("]\n");
 }
 
