@@ -4,7 +4,7 @@
 #include <time.h>
 
 #include "driver/elevio.h"
-//#include "OrderHanlder.h"
+#include "OrderHandler.h"
 
 
 typedef enum {
@@ -22,6 +22,8 @@ typedef struct {
 } ElevatorConditions;
 
 
+void logicControllerSetup();
+
 ElevatorState getCurrentState();
 MotorDirection getMotorDirection();
 
@@ -32,9 +34,11 @@ void runElevator(ElevatorState currentState, int is_new_state);
 
 void updateLogicController();
 
+void doorHandling(int state_enter);
+
+
 void testLogic();
 
-void doorHandling(int state_enter);
 
 
 #define MATRIX_ROWS 12

@@ -15,14 +15,25 @@ int* elevatorConditionArray[12];
 
 time_t g_door_open_time;
 
+void logicControllerSetup() {
+    p_elevatorConditions->currentState=OnFloor;
+    p_elevatorConditions->doorTimer=0;
+    p_elevatorConditions->motorDirection=DIRN_STOP;
+    p_elevatorConditions->stopPressed=0;
+}
+
+
+
 ElevatorState getCurrentState() { return p_elevatorConditions->currentState; }
 MotorDirection getMotorDirection() { return p_elevatorConditions->motorDirection; }
 
 void makeElevatorDataArray(int* dataArray, const ElevatorConditions* conditions) {
 
-    int currentFloor = 1; //elevio_lastFloor();
-    int orderFloor = 2; //getOrder(getMotorDirection(), currentFloor);
+    int currentFloor = elevio_lastFloor();
+    int orderFloor = getOrder(getMotorDirection(), currentFloor);
     ElevatorState currentState = conditions->currentState;
+
+    printf("Order floor: %d\n", orderFloor);
 
     dataArray[0] = currentFloor <  orderFloor;
     dataArray[1] = currentFloor >  orderFloor;
@@ -31,6 +42,12 @@ void makeElevatorDataArray(int* dataArray, const ElevatorConditions* conditions)
     dataArray[4] = conditions->activeObstruction;
     dataArray[5] = conditions->stopPressed;
     
+    if (orderFloor == -1) {
+        dataArray[0] = 0;
+        dataArray[1] = 0;
+        dataArray[2] = 0;
+    }
+
     for (int i=0; i<ELEVATORSTATE_LENGTH; i++) {
         dataArray[6+i] = currentState == i;
         printf("Data Array[%d]: %d\n", 6+i, dataArray[6+i]);
@@ -93,7 +110,7 @@ void runElevator(ElevatorState currentState, int is_new_state) {
     {
     case OnFloor:
         elevio_motorDirection(DIRN_STOP);
-        // clearFromList(elevio_lastFloor());
+        clearFloorFromList(elevio_lastFloor());
         break;
     
     case MovingUp:
@@ -139,6 +156,8 @@ void updateLogicController() {
         printf( "%d ", elevatorConditionArray[i]);
     }
     printf("\n");
+
+    delay_ms(100);
 }
 
 

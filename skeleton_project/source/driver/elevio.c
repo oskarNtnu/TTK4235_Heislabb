@@ -135,12 +135,13 @@ int elevio_floorSensor(void){
     return buf[1] ? buf[2] : -1;
 }
 
+static int lastFloor = 0;
 int elevio_lastFloor(void){
     if (elevio_floorSensor() == -1){
         return lastFloor;
     }
     else{
-        temp = lastFloor;
+        int temp = lastFloor;
         lastFloor = elevio_floorSensor();
         return temp;
     }

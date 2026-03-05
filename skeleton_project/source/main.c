@@ -10,7 +10,12 @@ int main(){
 
     elevio_init();
 
-    testLogic();
+    elevio_setup();
+
+    while (1) {
+        updateOrderHandler();
+        updateLogicController();
+    }
 
 
     printf("=== Example Program ===\n");

@@ -2,7 +2,6 @@
 
 
 #define N_FLOORS 4
-int lastFloor = 0;
 
 /*
 DIRN_DOWN
@@ -29,7 +28,7 @@ typedef enum {
     BUTTON_CAB          = 2
 } ButtonType;
 
-
+void elevio_setup();
 void elevio_init(void);
 
 void elevio_motorDirection(MotorDirection dirn);

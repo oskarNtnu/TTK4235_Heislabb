@@ -27,6 +27,13 @@ int getOrder(MotorDirection dir, int currentFloor){
             }
         }
     }
+    if (dir == DIRN_STOP){
+        for(int f = 0; f<N_FLOORS; f++){
+            if(orderUpList[f] == 1 || orderDownList[f] == 1){
+                return f;
+            }
+        }
+    }
     return -1; // No order in the direction of movement
 }
 
@@ -67,9 +74,9 @@ void addOrderToList(int currentFloor, MotorDirection dir, int floorOrder, Button
     }
 
 }
-void clearFloorFromList(int floor, int* upList, int* downList){
-    upList[floor] = 0;
-    downList[floor] = 0;
+void clearFloorFromList(int floor){
+    orderUpList[floor] = 0;
+    orderDownList[floor] = 0;
 }
 
 void updateOrderHandler(){
