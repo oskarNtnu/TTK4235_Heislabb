@@ -110,6 +110,7 @@ int elevio_floorSensor(void){
 }
 
 int elevio_lastFloor(void){
+<<<<<<< HEAD
     if (elevio_floorSensor() == -1){
         return lastFloor;
     }
@@ -119,6 +120,10 @@ int elevio_lastFloor(void){
         return temp;
     }
     
+=======
+    // todo
+    return 1;
+>>>>>>> OrderHandler
 }
 
 int elevio_stopButton(void){

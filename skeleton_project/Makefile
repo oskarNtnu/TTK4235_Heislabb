@@ -25,6 +25,12 @@ clean:
 $(EXECUTABLE): $(OBJECTS) 
 	$(COMPILER) $^ -o $@ $(LDFLAGS)
 
+
+OrderHandlerTest: source/orderHandler_test.c $(filter-out build/main.o, $(OBJECTS))
+	$(COMPILER) $(CFLAGS) $^ -o test_OrderHandler $(LDFLAGS)
+
+
+
 ## object files depend on source files: compile them
 $(OBJECTDIR)/%.o: $(SOURCEDIR)/%.c
 	@mkdir -p $(@D)
