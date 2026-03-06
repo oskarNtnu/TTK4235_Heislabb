@@ -8,6 +8,7 @@
 
 #include "elevio.h"
 #include "con_load.h"
+#include "OrderHandler.h"
 
 static int sockfd;
 static pthread_mutex_t sockmtx;
@@ -16,15 +17,12 @@ static pthread_mutex_t sockmtx;
 
 /*Initilize the elevator
 Get to a known floor, 0 in this case
-*/ 
 
-/*
-her tror jeg kanskje vi må legge inn håndtering av stopp knapp
-mens heisen er på vei til etasjen? Vi må bare dobbeltsjekke hva
-som står i FAT-en, og hvordan den skal oppføre seg igjen etterpå
-hvis stopp trykkes under setup?? Eventuelt dropper vi dette og
-spør på sal hva som var ment, tror ikke det står veldefinert i
-FAT-en.
+If stop is pressed durring setup the elevator stops, then when a order/call button is
+pressed the elevator (adds the order to orderlist and turns lamp on and then) continues
+down until it reaches floor 0
+
+Tror kaaanskje den skal stoppe i første etasje den paserer ikke i 0, men må dobbeltsjekke i FAT
 */
 void elevio_setup(){
     // Unknown floor
@@ -32,6 +30,23 @@ void elevio_setup(){
     if (elevio_floorSensor() != 0){
         elevio_motorDirection(DIRN_DOWN);
         while (elevio_floorSensor() != 0){
+            if (elevio_stopButton()) {
+                elevio_motorDirection(DIRN_STOP);
+            }
+
+            for(int f = 0; f < N_FLOORS; f++){
+                for(int b = 0; b < N_BUTTONS; b++){
+                    int btnPressed = elevio_callButton(f, b);
+                    if(btnPressed){
+                        elevio_buttonLamp(f, b, 1);                                                             // remove??
+                        addOrderToList(elevio_floorSensor(), DIRN_STOP, f, b, orderUpList, orderDownList);      // remove??
+                        
+                        // continue down 
+                        elevio_motorDirection(DIRN_DOWN)
+                    }
+
+                }
+            }
             nanosleep(&(struct timespec){0, 10*1000*1000}, NULL);
         }
         elevio_motorDirection(DIRN_STOP);
