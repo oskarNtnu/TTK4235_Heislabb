@@ -14,6 +14,7 @@ ElevatorConditions* p_elevatorConditions = &elevatorConditions;
 int* elevatorConditionArray[12];
 
 time_t g_door_open_time;
+MotorDirection lastMotorDirection = DIRN_STOP;
 
 void logicControllerSetup() {
     p_elevatorConditions->currentState=OnFloor;
@@ -23,31 +24,45 @@ void logicControllerSetup() {
 }
 
 
-
 ElevatorState getCurrentState() { return p_elevatorConditions->currentState; }
 MotorDirection getMotorDirection() { return p_elevatorConditions->motorDirection; }
 
-void makeElevatorDataArray(int* dataArray, const ElevatorConditions* conditions) {
 
-    int currentFloor = elevio_lastFloor();
+void makeElevatorDataArray(int* dataArray, const ElevatorConditions* p_conditions) {
+
+    int currentFloor = elevio_floorSensor();
+    int lastFloor = elevio_lastFloor();
     int orderFloor = getOrder(getMotorDirection(), currentFloor);
-    ElevatorState currentState = conditions->currentState;
+    ElevatorState currentState = p_conditions->currentState;
 
-    // printf("Order floor: %d\n", orderFloor);
+    // determine what floor is ordered compared to elevator position (above, below or same floor)
+    if (orderFloor == -1) { // no orders
 
-    dataArray[0] = currentFloor <  orderFloor;
-    dataArray[1] = currentFloor >  orderFloor;
-    dataArray[2] = currentFloor == orderFloor;
-    dataArray[3] = conditions->doorTimerFinnished;
-    dataArray[4] = conditions->activeObstruction;
-    dataArray[5] = conditions->stopPressed;
-    
-    if (orderFloor == -1) {
         dataArray[0] = 0;
         dataArray[1] = 0;
         dataArray[2] = 0;
+
+    } else  if ( getMotorDirection() == DIRN_STOP && currentFloor == -1 && lastFloor == orderFloor ) { // stoped between floors and going to last visited floor
+        
+        dataArray[0] = lastMotorDirection == DIRN_DOWN;
+        dataArray[1] = lastMotorDirection == DIRN_UP;
+        dataArray[2] = 0;
+
+    } else { // normal case
+
+        dataArray[0] = lastFloor <  orderFloor;
+        dataArray[1] = lastFloor >  orderFloor;
+        dataArray[2] = currentFloor == orderFloor;
     }
- 
+    
+
+
+    // fill inn data given from ElevatorConditions struckt
+    dataArray[3] = p_conditions->doorTimerFinnished;
+    dataArray[4] = p_conditions->activeObstruction;
+    dataArray[5] = p_conditions->stopPressed;
+    
+    // fill in current state
     for (int i=0; i<ELEVATORSTATE_LENGTH; i++) {
         dataArray[6+i] = currentState == i;
         // printf("Data Array[%d]: %d\n", 6+i, dataArray[6+i]);
@@ -106,37 +121,39 @@ ElevatorState getNextState( int* dataArray ) {
 }
 
 
-void runElevator(ElevatorState currentState, int is_new_state) {
+void runElevator(ElevatorState currentState, int is_new_state, ElevatorConditions* p_conditions) { 
 
     switch (currentState)
     {
     case OnFloor:
-        elevio_motorDirection(DIRN_STOP);
+        p_elevatorConditions->motorDirection = DIRN_STOP;
         break;
     
     case MovingUp:
-        elevio_motorDirection(DIRN_UP);
+        p_elevatorConditions->motorDirection = DIRN_UP;
         break;
     
     case MovingDown:
-        elevio_motorDirection(DIRN_DOWN);
+        p_elevatorConditions->motorDirection = DIRN_DOWN;
         break;
 
     case DoorOpen:
         clearFloorFromList(elevio_lastFloor());  // clear floor when door is opned not closed
-        elevio_motorDirection(DIRN_STOP);
+        p_elevatorConditions->motorDirection = DIRN_STOP;
         doorHandling(is_new_state);
         break;
 
     case Obstruction:
-        elevio_motorDirection(DIRN_STOP);
+        p_elevatorConditions->motorDirection = DIRN_STOP;
         break;
 
     case Stop:
-        elevio_motorDirection(DIRN_STOP);
+        p_elevatorConditions->motorDirection = DIRN_STOP;
         for (int i=0; i<N_FLOORS; i++) { clearFloorFromList(i); }
         break;
     }
+
+    elevio_motorDirection( p_elevatorConditions->motorDirection );
 } 
 
 
@@ -160,12 +177,17 @@ void updateLogicController() {
 
         printf("Next order: %d\n", getOrder(getMotorDirection(), elevio_lastFloor()));
         printf("Transitoning in to state: %d\n", state);
+
+        // update motordirection of previous state
+        lastMotorDirection = getMotorDirection();
     }
 
-    runElevator(state, is_new_state);
+    runElevator(state, is_new_state, p_elevatorConditions);
 
     
 }
+
+
 
 
 
@@ -184,86 +206,4 @@ void doorHandling(int state_enter) {
     } else {
         p_elevatorConditions->doorTimerFinnished = 0;
     }
-}
-   
-
-
-
-
-
-void testLogic() {
-
-    int dataArray[MATRIX_ROWS];
-    int* p_dataArray = &dataArray;
-
-    ElevatorConditions* p_ev = &elevatorConditions;
-
-    p_ev->activeObstruction=0;
-    p_ev->currentState=OnFloor;
-    p_ev->doorTimerFinnished=0;
-    p_ev->motorDirection=DIRN_UP;
-    p_ev->stopPressed=0;
-
-    makeElevatorDataArray(p_dataArray, p_ev);
-
-    printf("Data Array: ");
-    for (int i=0; i<MATRIX_ROWS; i++){
-        printf( "%d ", dataArray[i]);
-    }
-    printf("\n");
-
-    ElevatorState state = getNextState(p_dataArray);
-
-    
-    printf("\n\n");
-
-    printf("State: %d\n", state);
-
-    int is_new_state = p_ev->currentState != state;
-    p_ev->currentState = state;
-
-    printf("Entering new state: %d\n", state);
-
-    
-    // Go up
-    runElevator(state, is_new_state);
-
-    
-    // 1 sek
-    delay_ms(1000);
-
-    printf("\n\n");
-
-    // Go down
-    p_ev->currentState=MovingDown;
-    runElevator(MovingDown, is_new_state);
- 
-    delay_ms(1000);
-
-    
-    printf("\n\n");
-    
-    // stop and wait
-    p_ev->currentState=OnFloor;
-    runElevator(OnFloor, 1);
-    p_ev->currentState=DoorOpen;
-    updateLogicController();
-
-    delay_ms(1000);
-
-    printf("\n\n");
-    // wait with obstruction
-    p_ev->activeObstruction = 1;
-    updateLogicController();
-
-    delay_ms(1000);
-
-    printf("\n\n");
-    // wait for door to close and continue
-    p_ev->activeObstruction = 0;
-
-    while (1) {
-        updateLogicController();
-    }
-    //*/
 }

@@ -18,6 +18,14 @@ static pthread_mutex_t sockmtx;
 Get to a known floor, 0 in this case
 */ 
 
+/*
+her tror jeg kanskje vi må legge inn håndtering av stopp knapp
+mens heisen er på vei til etasjen? Vi må bare dobbeltsjekke hva
+som står i FAT-en, og hvordan den skal oppføre seg igjen etterpå
+hvis stopp trykkes under setup?? Eventuelt dropper vi dette og
+spør på sal hva som var ment, tror ikke det står veldefinert i
+FAT-en.
+*/
 void elevio_setup(){
     // Unknown floor
     // Go down until floor =0
