@@ -1,5 +1,16 @@
 #include "LogicController.h"
 
+/* 
+    #### STATIC HELPER FUNCTIONS DECLERATION ####
+*/
+static void makeElevatorDataArray(int* dataArray, const ElevatorConditions* p_conditions);
+static ElevatorState getNextState( int* dataArray );
+static void runElevator(ElevatorState currentState, int is_new_state, ElevatorConditions* p_conditions);
+static void doorHandling(int state_enter);
+
+
+
+// tmp
 void delay_ms(int milliseconds) {
     struct timespec ts;
     ts.tv_sec = milliseconds / 1000;
@@ -7,16 +18,21 @@ void delay_ms(int milliseconds) {
     nanosleep(&ts, NULL);
 }
 
+/*
+    #### Static variables ####
+*/
+static ElevatorConditions elevatorConditions;
+static ElevatorConditions* p_elevatorConditions = &elevatorConditions;
+static int* elevatorConditionArray[12];
+
+static time_t g_door_open_time;
+static MotorDirection lastMotorDirection = DIRN_STOP;
 
 
-ElevatorConditions elevatorConditions;
-ElevatorConditions* p_elevatorConditions = &elevatorConditions;
-int* elevatorConditionArray[12];
-
-time_t g_door_open_time;
-MotorDirection lastMotorDirection = DIRN_STOP;
-
-void logicControllerSetup() {
+/*
+    #### Global functions ####
+*/
+void setupLogicController() {
     p_elevatorConditions->currentState=OnFloor;
     p_elevatorConditions->doorTimerFinnished=0;
     p_elevatorConditions->motorDirection=DIRN_STOP;
@@ -24,11 +40,47 @@ void logicControllerSetup() {
 }
 
 
+void updateLogicController() {
+    p_elevatorConditions->activeObstruction = elevio_obstruction();
+    p_elevatorConditions->stopPressed = elevio_stopButton();
+
+    makeElevatorDataArray(elevatorConditionArray, p_elevatorConditions);
+    
+    ElevatorState state = getNextState(elevatorConditionArray);
+
+    int is_new_state = p_elevatorConditions->currentState != state;
+    p_elevatorConditions->currentState = state;
+
+    if (is_new_state) {
+        printf("Data Array: ");
+        for (int i=0; i<MATRIX_ROWS; i++){
+            printf( "%d ", elevatorConditionArray[i]);
+        }
+        printf("\n");
+
+        printf("Next order: %d\n", getOrder(getMotorDirection(), elevio_lastFloor()));
+        printf("Transitoning in to state: %d\n", state);
+
+        // update motordirection of previous state
+        lastMotorDirection = getMotorDirection();
+    }
+
+    runElevator(state, is_new_state, p_elevatorConditions);
+
+    
+}
+
+
+// global helper functions
 ElevatorState getCurrentState() { return p_elevatorConditions->currentState; }
 MotorDirection getMotorDirection() { return p_elevatorConditions->motorDirection; }
 
 
-void makeElevatorDataArray(int* dataArray, const ElevatorConditions* p_conditions) {
+
+/*
+    #### static helper function defenitions ####
+*/
+static void makeElevatorDataArray(int* dataArray, const ElevatorConditions* p_conditions) {
 
     int currentFloor = elevio_floorSensor();
     int lastFloor = elevio_lastFloor();
@@ -70,7 +122,7 @@ void makeElevatorDataArray(int* dataArray, const ElevatorConditions* p_condition
 }
 
 
-ElevatorState getNextState( int* dataArray ) {
+static ElevatorState getNextState( int* dataArray ) {
     
     int rulesAcheived[MATRIX_COLUMNS];
 
@@ -121,7 +173,7 @@ ElevatorState getNextState( int* dataArray ) {
 }
 
 
-void runElevator(ElevatorState currentState, int is_new_state, ElevatorConditions* p_conditions) { 
+static void runElevator(ElevatorState currentState, int is_new_state, ElevatorConditions* p_conditions) { 
 
     switch (currentState)
     {
@@ -157,41 +209,7 @@ void runElevator(ElevatorState currentState, int is_new_state, ElevatorCondition
 } 
 
 
-void updateLogicController() {
-    p_elevatorConditions->activeObstruction = elevio_obstruction();
-    p_elevatorConditions->stopPressed = elevio_stopButton();
-
-    makeElevatorDataArray(elevatorConditionArray, p_elevatorConditions);
-    
-    ElevatorState state = getNextState(elevatorConditionArray);
-
-    int is_new_state = p_elevatorConditions->currentState != state;
-    p_elevatorConditions->currentState = state;
-
-    if (is_new_state) {
-        printf("Data Array: ");
-        for (int i=0; i<MATRIX_ROWS; i++){
-            printf( "%d ", elevatorConditionArray[i]);
-        }
-        printf("\n");
-
-        printf("Next order: %d\n", getOrder(getMotorDirection(), elevio_lastFloor()));
-        printf("Transitoning in to state: %d\n", state);
-
-        // update motordirection of previous state
-        lastMotorDirection = getMotorDirection();
-    }
-
-    runElevator(state, is_new_state, p_elevatorConditions);
-
-    
-}
-
-
-
-
-
-void doorHandling(int state_enter) {
+static void doorHandling(int state_enter) {
     time_t current_time = time(NULL);
 
     if (state_enter) {

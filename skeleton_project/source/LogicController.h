@@ -22,24 +22,17 @@ typedef struct {
 } ElevatorConditions;
 
 
-void logicControllerSetup();
+void setupLogicController();
+void updateLogicController();
+
 
 ElevatorState getCurrentState();
 MotorDirection getMotorDirection();
 
-void makeElevatorDataArray(int* dataArray, const ElevatorConditions* conditions);
-ElevatorState getNextState( int* dataArray );
 
-void runElevator(ElevatorState currentState, int is_new_state);
-
-void updateLogicController();
-
-void doorHandling(int state_enter);
-
-
-void testLogic();
-
-
+/*
+    #### MATRICES ####
+*/
 
 #define MATRIX_ROWS 12
 #define MATRIX_COLUMNS 9
