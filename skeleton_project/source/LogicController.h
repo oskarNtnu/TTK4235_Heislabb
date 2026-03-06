@@ -13,7 +13,7 @@ typedef enum {
 
 
 typedef struct {
-    int doorTimer;
+    int doorTimerFinnished;
     int activeObstruction;
     int stopPressed;
     ElevatorState currentState;

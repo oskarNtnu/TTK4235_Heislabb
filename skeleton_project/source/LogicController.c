@@ -17,7 +17,7 @@ time_t g_door_open_time;
 
 void logicControllerSetup() {
     p_elevatorConditions->currentState=OnFloor;
-    p_elevatorConditions->doorTimer=0;
+    p_elevatorConditions->doorTimerFinnished=0;
     p_elevatorConditions->motorDirection=DIRN_STOP;
     p_elevatorConditions->stopPressed=0;
 }
@@ -33,12 +33,12 @@ void makeElevatorDataArray(int* dataArray, const ElevatorConditions* conditions)
     int orderFloor = getOrder(getMotorDirection(), currentFloor);
     ElevatorState currentState = conditions->currentState;
 
-    printf("Order floor: %d\n", orderFloor);
+    // printf("Order floor: %d\n", orderFloor);
 
     dataArray[0] = currentFloor <  orderFloor;
     dataArray[1] = currentFloor >  orderFloor;
     dataArray[2] = currentFloor == orderFloor;
-    dataArray[3] = conditions->doorTimer;
+    dataArray[3] = conditions->doorTimerFinnished;
     dataArray[4] = conditions->activeObstruction;
     dataArray[5] = conditions->stopPressed;
     
@@ -47,10 +47,10 @@ void makeElevatorDataArray(int* dataArray, const ElevatorConditions* conditions)
         dataArray[1] = 0;
         dataArray[2] = 0;
     }
-
+ 
     for (int i=0; i<ELEVATORSTATE_LENGTH; i++) {
         dataArray[6+i] = currentState == i;
-        printf("Data Array[%d]: %d\n", 6+i, dataArray[6+i]);
+        // printf("Data Array[%d]: %d\n", 6+i, dataArray[6+i]);
     }
 }
 
@@ -67,7 +67,7 @@ ElevatorState getNextState( int* dataArray ) {
     for (int i=0; i<MATRIX_ROWS; i++){
         for (int j=0; j<MATRIX_COLUMNS; j++){
             if (i == 0 && j==0) {
-                printf("Mask: %d\nData Array[0] %d\n", MASK_MATRIX[i][j], dataArray[i]);
+                // printf("Mask: %d\nData Array[0] %d\n", MASK_MATRIX[i][j], dataArray[i]);
             }
             int b = MASK_MATRIX[i][j] & dataArray[i];
 
@@ -75,10 +75,10 @@ ElevatorState getNextState( int* dataArray ) {
                 rulesAcheived[j] = 0;
             }
 
-            printf("%d ", b);
+            // printf("%d ", b);
 
         }
-        printf("\n");
+        // printf("\n");
     }
 
 
@@ -94,8 +94,12 @@ ElevatorState getNextState( int* dataArray ) {
     if ( rulesAcheived[7] ) { nextState = DoorOpen; }
     if ( rulesAcheived[8] ) { nextState = Stop; }
 
-    for (int i=0; i<MATRIX_COLUMNS; i++) {
-        printf("rulesAcheived[%d], %d\n", i, rulesAcheived[i]);
+    if (getCurrentState() != nextState) {
+        printf("rulesAcheived: ");
+        for (int i=0; i<MATRIX_COLUMNS; i++) {
+            printf(" %d", rulesAcheived[i]);
+        }
+        printf("\n");
     }
 
     return nextState;
@@ -104,13 +108,10 @@ ElevatorState getNextState( int* dataArray ) {
 
 void runElevator(ElevatorState currentState, int is_new_state) {
 
-    printf("Running elevator in state: %d\n", currentState);
-
     switch (currentState)
     {
     case OnFloor:
         elevio_motorDirection(DIRN_STOP);
-        clearFloorFromList(elevio_lastFloor());
         break;
     
     case MovingUp:
@@ -122,6 +123,7 @@ void runElevator(ElevatorState currentState, int is_new_state) {
         break;
 
     case DoorOpen:
+        clearFloorFromList(elevio_lastFloor());  // clear floor when door is opned not closed
         elevio_motorDirection(DIRN_STOP);
         doorHandling(is_new_state);
         break;
@@ -132,6 +134,7 @@ void runElevator(ElevatorState currentState, int is_new_state) {
 
     case Stop:
         elevio_motorDirection(DIRN_STOP);
+        for (int i=0; i<N_FLOORS; i++) { clearFloorFromList(i); }
         break;
     }
 } 
@@ -148,16 +151,20 @@ void updateLogicController() {
     int is_new_state = p_elevatorConditions->currentState != state;
     p_elevatorConditions->currentState = state;
 
+    if (is_new_state) {
+        printf("Data Array: ");
+        for (int i=0; i<MATRIX_ROWS; i++){
+            printf( "%d ", elevatorConditionArray[i]);
+        }
+        printf("\n");
+
+        printf("Next order: %d\n", getOrder(getMotorDirection(), elevio_lastFloor()));
+        printf("Transitoning in to state: %d\n", state);
+    }
+
     runElevator(state, is_new_state);
 
-
-    printf("Data Array: ");
-    for (int i=0; i<MATRIX_ROWS; i++){
-        printf( "%d ", elevatorConditionArray[i]);
-    }
-    printf("\n");
-
-    delay_ms(100);
+    
 }
 
 
@@ -167,15 +174,15 @@ void doorHandling(int state_enter) {
 
     if (state_enter) {
         g_door_open_time = current_time;
-        printf("Doors closed\n");
+        printf("Doors opned\n");
     }
 
     time_t elapsed_time = current_time - g_door_open_time;
     if (elapsed_time >= 3){
-        p_elevatorConditions->doorTimer = 1;
-        printf("Doors opned\n");
+        p_elevatorConditions->doorTimerFinnished = 1;
+        printf("Doors closed\n");
     } else {
-        p_elevatorConditions->doorTimer = 0;
+        p_elevatorConditions->doorTimerFinnished = 0;
     }
 }
    
@@ -193,7 +200,7 @@ void testLogic() {
 
     p_ev->activeObstruction=0;
     p_ev->currentState=OnFloor;
-    p_ev->doorTimer=0;
+    p_ev->doorTimerFinnished=0;
     p_ev->motorDirection=DIRN_UP;
     p_ev->stopPressed=0;
 

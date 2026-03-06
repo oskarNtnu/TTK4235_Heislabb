@@ -17,9 +17,9 @@ int main(){
         updateLogicController();
     }
 
-
-    printf("=== Example Program ===\n");
     /*
+    printf("=== Example Program ===\n");
+    
     printf("Press the stop button on the elevator panel to exit\n");
 
     elevio_motorDirection(DIRN_UP);
