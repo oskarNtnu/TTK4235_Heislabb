@@ -70,6 +70,13 @@ void addOrderToList(int currentFloor, MotorDirection dir, int floorOrder, Button
 void clearFloorFromList(int floor, int* upList, int* downList){
     upList[floor] = 0;
     downList[floor] = 0;
+
+    // Turn of light 
+    for(int b = 0; b < N_BUTTONS; b++){
+        elevio_buttonLamp(floor, b, 0);
+    }
+
+
 }
 
 void updateOrderHandler(){
