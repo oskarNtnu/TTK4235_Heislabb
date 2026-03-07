@@ -44,6 +44,9 @@ void elevio_setup(){
                 elevio_buttonLamp(f, b, 0);
             }
         }
+    
+        elevio_stopLamp(0);
+        elevio_doorOpenLamp(0);
 }
 
 
