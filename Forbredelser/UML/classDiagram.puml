@@ -1,7 +1,7 @@
 @startuml class diagram
 
-class Initilize
 
+class Initilize
 
 ' Controlls the mechanical stuff, and the floor indicator
 class ElevatorController{
@@ -70,10 +70,10 @@ Initilize --> ElevatorController
 
 LogicController ..> ObsructionButton
 
-LogicController ..> OrderHandler
+LogicController ...> OrderHandler
 
 LogicController ..> StoppButton
-LogicController ..> FloorSensor
+LogicController .> FloorSensor
 
 LogicController --> ElevatorController
 
