@@ -1,0 +1,31 @@
+@startuml
+
+
+Participant User
+
+Participant Lights
+
+User -> Button
+activate Button
+
+
+activate OrderHandler
+Button -> OrderHandler
+deactivate Button
+
+Lights <- OrderHandler
+activate Lights
+
+
+OrderHandler -> LogicController
+activate LogicController
+deactivate OrderHandler
+
+LogicController -> Elevator
+activate Elevator
+deactivate LogicController
+
+User <- Lights  
+deactivate Lights
+
+@enduml
