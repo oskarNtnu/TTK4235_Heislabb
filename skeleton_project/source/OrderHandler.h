@@ -6,7 +6,8 @@
 extern int orderUpList[4];
 extern int orderDownList[4];
 
-int getOrder(MotorDirection dir, int currentFloor);
+int updateOrder(int currentFloor);
+int getOrder();
 
 void addOrderToList(int currentFloor, MotorDirection dir, int floorOrder, ButtonType buttonType,  int* upList, int* downList );
 void clearFloorFromList(int floor);

@@ -1,8 +1,11 @@
 #include "OrderHandler.h"
+#include "driver/elevio.h"
 
 
 int orderUpList[4];
 int orderDownList[4];
+int currentOrder = -1;
+MotorDirection preferedDirection = DIRN_UP;
 
 /*Get the next order to complete
 * Check if the dirrection is up or down, goes trough orderUpList or orderDownList and returns the closest value that is 1 - except the current floor
@@ -11,30 +14,45 @@ int orderDownList[4];
 * @param currentFloor
 *   The last active floor
 */
-int getOrder(MotorDirection dir, int currentFloor){
-    if(dir == DIRN_UP){
+int updateOrder(int currentFloor) {
+    if(preferedDirection == DIRN_UP){
         // If currentfloor = N_FLOORS-1 wont the loop start -> never an order above the upper floor
         for(int f = currentFloor+1; f<N_FLOORS; f++ ){ // currentFloor+1 is because if the elevator moves up, it can't have a order that have just passed  
             if(orderUpList[f] == 1){
                 return f;
             }
         }
-    }
-    if(dir == DIRN_DOWN){
-        for(int f = currentFloor-1; f>N_FLOORS; f--){
+        // No orders above, switch prefered direction and check if there are orders below
+        preferedDirection = DIRN_DOWN;
+        for(int f = N_FLOORS-1; f>=0; f--){
             if(orderDownList[f] == 1){
                 return f;
             }
         }
+
     }
-    if (dir == DIRN_STOP){
-        for(int f = 0; f<N_FLOORS; f++){
-            if(orderUpList[f] == 1 || orderDownList[f] == 1){
+    if(preferedDirection == DIRN_DOWN){
+        for(int f = currentFloor-1; f>=0; f--){
+            if(orderDownList[f] == 1){
                 return f;
             }
         }
-    }
+        // No orders below, switch prefered direction and check if there are orders above
+        preferedDirection = DIRN_UP;
+        if(preferedDirection == DIRN_UP){
+        // If currentfloor = N_FLOORS-1 wont the loop start -> never an order above the upper floor
+        for(int f = 0; f<N_FLOORS; f++ ){ // currentFloor+1 is because if the elevator moves up, it can't have a order that have just passed  
+            if(orderUpList[f] == 1){
+                return f;
+            }
+        }
+    }}
+
     return -1; // No order in the direction of movement
+}
+
+int getOrder() {
+    return currentOrder;
 }
 
 /* Add a button order to one of the order lists
@@ -61,6 +79,7 @@ void addOrderToList(int currentFloor, MotorDirection dir, int floorOrder, Button
         else{
             if (dir == DIRN_DOWN){  upList[floorOrder] = 1;}
             else if(dir == DIRN_UP){    downList[floorOrder] = 1;}
+            else {   upList[floorOrder] = 1; downList[floorOrder] = 1;} // if the elevator is stoped, the order can be placed in both lists, and the prefered direction will decide which one to complete first)
             // If the elevator is stopped, nothing should happen, order to the same floor
         }
     } 
@@ -77,6 +96,11 @@ void addOrderToList(int currentFloor, MotorDirection dir, int floorOrder, Button
 void clearFloorFromList(int floor){
     orderUpList[floor] = 0;
     orderDownList[floor] = 0;
+
+    for (int b=0; b<N_BUTTONS; b++){
+        elevio_buttonLamp(floor, b, 0);
+    }
+    currentOrder = updateOrder(floor);
 }
 
 void updateOrderHandler(){
@@ -85,7 +109,8 @@ void updateOrderHandler(){
             int btnPressed = elevio_callButton(f, b);
             if(btnPressed){
                 elevio_buttonLamp(f, b, 1);
-                addOrderToList(elevio_floorSensor(), DIRN_STOP, f, b, orderUpList, orderDownList);
+                addOrderToList(elevio_lastFloor(), DIRN_STOP, f, b, orderUpList, orderDownList);
+                currentOrder = updateOrder(elevio_lastFloor());
             }
 
         }
