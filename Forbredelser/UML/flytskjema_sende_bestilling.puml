@@ -1,0 +1,14 @@
+@startuml Sende Bestilling
+- Getorder()
+repeat
+if (Foretrekket retning?) then (Opp)
+- Hent nærmeste bestilling fra \n'opp list' som er over heisen 
+else (Ned)
+- Hent nærmeste bestilling fra \n'ned list' som er under heisen 
+
+endif
+backward:Endre foredrukket retning;
+repeat while (Ingen bestilling i liste?) is (True) not (False)
+    
+- Returner neste stopp
+@enduml

@@ -1,0 +1,24 @@
+@startuml Motta bestilling
+
+start
+- Bestillingsknapp trykkes
+if (Kabinknapp) then (True) 
+    if (Etasje over heis?) then (True)
+    - Opp liste 
+        
+    else (False)
+    - Ned liste 
+        
+    endif
+    
+else (False)
+if (Oppknapp?) then (True)
+    - Opp liste
+else (False)
+    - Ned liste
+endif
+    
+endif
+end
+
+@enduml
