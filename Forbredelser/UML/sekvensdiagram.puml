@@ -5,27 +5,28 @@ Participant User
 
 Participant Lights
 
-User -> Button
+User -> Button : Button pressed
 activate Button
 
 
 activate OrderHandler
-Button -> OrderHandler
+Button -> OrderHandler : Forwarding input
 deactivate Button
 
-Lights <- OrderHandler
+Lights <- OrderHandler : Turn on lights
 activate Lights
 
 
-OrderHandler -> LogicController
+OrderHandler -> LogicController : Next floor
 activate LogicController
 deactivate OrderHandler
 
-LogicController -> Elevator
+LogicController -> Elevator : Run elevator
 activate Elevator
 deactivate LogicController
+deactivate Elevator
 
-User <- Lights  
+User <- Lights : User sees lights
 deactivate Lights
 
 @enduml

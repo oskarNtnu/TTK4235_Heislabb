@@ -1,81 +1,68 @@
 @startuml class diagram
 
-class Initilize
+class Initilize {
+    +elevio_setup() : void
+}
 
 
 ' Controlls the mechanical stuff, and the floor indicator
-class ElevatorController{
-    +elevatorDirection: int
-    +elevatorMoving: boolean
-    +elevatorUp() : void
-    +elevatorDown() : void
-    +elevatorStop() : void
-    +setFloorIndicator(int floor) : void
+class elevio {
+    +elevio_init() : void
 
-    +updateElevatorController() : void
+    +elevio_motorDirection(MotorDirection dirn) : void
+    +elevio_buttonLamp(int floor, ButtonType button, int value) : void
+    +elevio_floorIndicator(int floor) : void
+    +elevio_doorOpenLamp(int value) : void
+    +elevio_stopLamp(int value) : void
+
+    +elevio_callButton(int floor, ButtonType button) : int
+    +elevio_floorSensor() : int
+    +elevio_lastFloor() : int
+    +elevio_stopButton() : int
+    +elevio_obstruction() : int
 }
 
 class LogicController{
-    +struct ElevatorConditions {
-        enum Direction,
-        bool doorTimer,
-        bool activeObstruction,
-        bool stopPredded,
-        ElevatorState currentState,
-        
-    +int[12] ElevatorConditionVector,
-    +getOrderDirrection() : enum Direction
-    +makeElevatorConditionVector(struct ElevatorConditions, *dataVector) : void
-    +getNextState() : ElevatorState
+    -elevatorConditions : ElevatorConditions*
+    -p_elevatorConditions : ElevatorConditions*
+    -elevatorConditionArray[12] : int*
+    -g_door_open_time : time_t
+    -lastMotorDirection : MotorDirection
 
-    'Use the functions in ElevatorController to control the elevator, based on the current state and the derided next state
-    +doStuff( ElevatorState currentState) : void
+    +doorTimerFinnished : int
+    +activeObstruction : int
+    +stopPressed : int
+    +currentState : ElevatorState
+    +motorDirection : MotorDirection
 
+    -makeElevatorDataArray(int* dataArray, const ElevatorConditions* p_conditions) : void
+    -getNextState( int* dataArray ) : ElevatorState
+    -runElevator(ElevatorState currentState, int is_new_state, ElevatorConditions* p_conditions) : void
+    -doorHandling(int state_enter) : void
+
+    +setupLogicController() : void
     +updateLogicController() : void
-
+    +getCurrentState() : ElevatorState
+    +getMotorDirection() : MotorDirection
 }
 
 class OrderHandler{
-    +orderUpList: int[4]
-    +orderDownList: int[4]
-    +sortList(bool reverse, *int[16] list) : void
-    +findNextOrder(Direction direction, *int[16] upList, *int[16] downList, int currentFloor) : int
-    +clearFloorFromLists(int floor, *int[16] upList, *int[16] downList) : void
-    +addOrderToList(int floor, Direction direction, *int[16] upList, *int[16] downList, *ButtonStates) : void
-    +getNextOrder() : int
+    +orderUpList[4] : int
+    +orderDownList[4] : int
 
-    +ButtonStates
-    +getButtonStates() : ButtonStates
-    
-    +updateOrderHnadler(): void
+    +updateOrder(int currentFloor) : int
+    +getOrder() : int
+    +addOrderToList(int currentFloor, MotorDirection dir, int floorOrder, ButtonType buttonType,  int* upList, int* downList ): void
+    +clearFloorFromList(int floor) : void
+    +updateOrderHandler() : void
+    +printList(const int* list) : void
 }
 
-class ObsructionButton{
-    +getObstructionValue() : boolean
-}
+Initilize --> elevio
 
-class StoppButton{
-    +getStopButtonValue() : boolean
-}
+LogicController ---> OrderHandler
 
-class FloorSensor{
-    +lastFloor: int
-    +currentFloor: int
-    ' returns -1 if the elevator is between floors
-    +getFloor() : int
-    +getLastFloor() : int
-}
-
-Initilize --> ElevatorController
-
-LogicController ..> ObsructionButton
-
-LogicController ..> OrderHandler
-
-LogicController ..> StoppButton
-LogicController ..> FloorSensor
-
-LogicController --> ElevatorController
+LogicController --> elevio
 
 
 
